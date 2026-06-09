@@ -32,12 +32,6 @@ final List<Map <String, String>> incidents = [
     "aula": "A-101",
     "estado": "Pendiente",
     "fecha": "08/06/2026"
-  },
-  {
-    "titulo": "Proyector averiado",
-    "aula": "A-101",
-    "estado": "Pendiente",
-    "fecha": "08/06/2026"
   }
 ];
 
