@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 
 class PagesAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const PagesAppBar({super.key});
+  final String title;
+
+  const PagesAppBar({
+    super.key,
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       title: Text(
-        "Mis Incidencias",
+        title,
         style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
           fontSize: 20
         ),
       ),
-      backgroundColor: Colors.blue,
+      backgroundColor: const Color.fromARGB(255, 15, 100, 169),
       elevation: 10,
       shadowColor: Colors.black,
       centerTitle: true,
@@ -25,10 +30,6 @@ class PagesAppBar extends StatelessWidget implements PreferredSizeWidget {
           Navigator.pop(context);
         },
       ),
-      actions: [
-        Icon(Icons.search, color: Colors.lightBlue, size: 30),
-        Icon(Icons.more_vert, color: Colors.lightBlue, size: 30),
-      ],
       toolbarHeight: 100,
     );
   }

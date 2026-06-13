@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
-class TextFieldGeneral extends StatelessWidget {
+class TextFormFieldGeneral extends StatelessWidget {
   final TextInputType keyboardType;
   final IconData icon;
   final String labelText;
   final String hintText;
   final Function(String)? onChanged;
   final bool obscureText;
+  final String? Function(String?)? validator;
 
-  const TextFieldGeneral({
+  const TextFormFieldGeneral({
     super.key,
     required this.keyboardType,
     required this.icon,
@@ -16,17 +17,17 @@ class TextFieldGeneral extends StatelessWidget {
     required this.hintText,
     this.onChanged,
     this.obscureText = false,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 30.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(10),
       ),
-      child: TextField(
+      child: TextFormField(
         keyboardType: keyboardType,
         obscureText: obscureText,
         decoration: InputDecoration(
@@ -35,6 +36,7 @@ class TextFieldGeneral extends StatelessWidget {
           hintText: hintText
         ),
         onChanged: onChanged,
+        validator: validator,
       ),
     );
   }
@@ -72,7 +74,6 @@ class RedirectText extends StatelessWidget {
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            decoration: TextDecoration.underline,
           ),
         ),
       ),
@@ -81,22 +82,63 @@ class RedirectText extends StatelessWidget {
   }
 }
 
+class DropdownList extends StatelessWidget {
+  final List<Map<String, String>> items;
+  final IconData icon;
+  final String? selectedValue;
+  final ValueChanged<String?> onChanged;
+  final String labelText;
+  final String? Function(String?)? validator;
+
+  const DropdownList({
+    super.key,
+    required this.items,
+    required this.icon,
+    required this.selectedValue,
+    required this.onChanged,
+    required this.labelText,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      initialValue: selectedValue,
+      decoration: InputDecoration(
+        hintText: labelText,
+        prefixIcon: Icon(icon),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(13),
+        ),
+      ),
+      items: items.map((item) {
+        return DropdownMenuItem<String>(
+          value: item['code'],
+          child: Text(item['name']!),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      validator: validator,
+    );
+  }
+}
+
 class ButtonAuth extends StatelessWidget {
   final String text;
-  final String route;
+  final VoidCallback onPressed;
 
   const ButtonAuth({
     super.key,
     required this.text,
-    required this.route,
+    required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => {
-        Navigator.pushNamed(context, route),
-      },
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         minimumSize: const Size(270, 50),
         backgroundColor: Colors.white,
