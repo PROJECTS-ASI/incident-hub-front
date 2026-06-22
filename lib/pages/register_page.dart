@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:incident_hub/pages/incident_page.dart';
+import 'package:flutter/services.dart';
+import 'package:incident_hub/data/user_repository.dart';
 import 'package:incident_hub/pages/login_page.dart';
+import 'package:incident_hub/validations/auth_validation.dart';
 import 'package:incident_hub/widgets/auth_widget.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -12,7 +14,10 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final _formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
   String? selectedRole;
 
   @override
@@ -24,7 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Form(
-              key: _formKey,
+              key: formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -65,6 +70,10 @@ class _RegisterPageState extends State<RegisterPage> {
       labelText: "Nombres y Apellidos",
       hintText: "Jimmy Page",
       onChanged: (value) {},
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ ]")),
+      ],
+      controller: nameController,
       validator: validateName,
     );
   }
@@ -76,6 +85,10 @@ class _RegisterPageState extends State<RegisterPage> {
       labelText: "Correo",
       hintText: "jimmy1999@gmail.com",
       onChanged: (value) {},
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'\s')),
+      ],
+      controller: emailController,
       validator: validateEmail,
     );
   }
@@ -88,6 +101,10 @@ class _RegisterPageState extends State<RegisterPage> {
       hintText: "********",
       onChanged: (value) {},
       obscureText: true,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'\s')),
+      ],
+      controller: passwordController,
       validator: validatePassword,
     );
   }
@@ -96,7 +113,8 @@ class _RegisterPageState extends State<RegisterPage> {
     return DropdownList(
       items: [
         { 'code': 'STUDENT', 'name': 'Estudiante' },
-        { 'code': 'TEACHER', 'name': 'Profesor' },
+        { 'code': 'TEACHER', 'name': 'Docente' },
+        { 'code': 'TECHNICAL_SUPPORT', 'name': 'Soporte técnico' },
       ],
       icon: Icons.person,
       selectedValue: selectedRole, 
@@ -114,8 +132,27 @@ class _RegisterPageState extends State<RegisterPage> {
     return ButtonAuth(
       text: "REGISTRARSE",
       onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          Navigator.pushNamed(context, IncidentPage.id);
+        if (formKey.currentState!.validate()) {
+          final email = emailController.text.toLowerCase();
+          final duplicateEmail = UserRepository.emailExists(email);
+          if (duplicateEmail) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('El correo ya existe.')),
+            );
+            return;
+          }
+
+          UserRepository.addUser(
+            User(
+              email: email,
+              password: passwordController.text,
+              name: nameController.text.trim(),
+              role: selectedRole!,
+              createdDate: DateTime.now(),
+              updatedDate: DateTime.now(),
+            ),
+          );
+          Navigator.pushNamed(context, LoginPage.id);
         }
       },
     );
@@ -128,35 +165,4 @@ class _RegisterPageState extends State<RegisterPage> {
       route: LoginPage.id,
     );
   }
-}
-
-String? validateName(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Ingrese nombres y apellidos.';
-  }
-  return null;
-}
-
-String? validateEmail(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Ingrese un correo.';
-  }
-  if (!value.contains('@')) {
-    return 'Correo inválido.';
-  }
-  return null;
-}
-
-String? validatePassword(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Ingrese una contraseña.';
-  }
-  return null;
-}
-
-String? validateDropdown(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Ingrese un rol.';
-  }
-  return null;
 }

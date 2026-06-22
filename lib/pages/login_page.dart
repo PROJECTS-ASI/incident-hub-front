@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:incident_hub/data/user_repository.dart';
 import 'package:incident_hub/pages/incident_page.dart';
 import 'package:incident_hub/pages/register_page.dart';
+import 'package:incident_hub/validations/auth_validation.dart';
 import 'package:incident_hub/widgets/auth_widget.dart';
 
 class LoginPage extends StatefulWidget {
@@ -12,7 +15,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Form(
-              key: _formKey,
+              key: formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -59,6 +64,10 @@ class _LoginPageState extends State<LoginPage> {
       icon: Icons.email_outlined,
       labelText: "Correo",
       hintText: "jimmy1999@gmail.com",
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'\s')),
+      ],
+      controller: emailController,
       validator: validateEmail,
     );
   }
@@ -70,6 +79,10 @@ class _LoginPageState extends State<LoginPage> {
       labelText: "Contraseña",
       hintText: "********",
       obscureText: true,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'\s')),
+      ],
+      controller: passwordController,
       validator: validatePassword,
     );
   }
@@ -78,8 +91,17 @@ class _LoginPageState extends State<LoginPage> {
     return ButtonAuth(
       text: "INICIAR SESIÓN",
       onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          Navigator.pushNamed(context, IncidentPage.id);
+        if (formKey.currentState!.validate()) {
+          final email = emailController.text.toLowerCase();
+          final user = UserRepository.login(email, passwordController.text);
+          if (user == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Usuario o contraseña incorrectos.')),
+            );
+            return;
+          }
+          UserSession.currentUser = user;
+          Navigator.pushReplacementNamed(context, IncidentPage.id);
         }
       },
     );
@@ -92,21 +114,4 @@ class _LoginPageState extends State<LoginPage> {
       route: RegisterPage.id,
     );
   }
-}
-
-String? validateEmail(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Ingrese un correo.';
-  }
-  if (!value.contains('@')) {
-    return 'Correo inválido.';
-  }
-  return null;
-}
-
-String? validatePassword(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Ingrese una contraseña.';
-  }
-  return null;
 }

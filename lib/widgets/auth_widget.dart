@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TextFormFieldGeneral extends StatelessWidget {
   final TextInputType keyboardType;
@@ -7,6 +8,8 @@ class TextFormFieldGeneral extends StatelessWidget {
   final String hintText;
   final Function(String)? onChanged;
   final bool obscureText;
+  final List<TextInputFormatter>? inputFormatters;
+  final TextEditingController controller;
   final String? Function(String?)? validator;
 
   const TextFormFieldGeneral({
@@ -17,6 +20,8 @@ class TextFormFieldGeneral extends StatelessWidget {
     required this.hintText,
     this.onChanged,
     this.obscureText = false,
+    this.inputFormatters,
+    required this.controller,
     this.validator,
   });
 
@@ -28,8 +33,10 @@ class TextFormFieldGeneral extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: TextFormField(
+        controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
+        inputFormatters: inputFormatters,
         decoration: InputDecoration(
           prefixIcon: Icon(icon),
           labelText: labelText,
