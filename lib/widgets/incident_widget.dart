@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:incident_hub/models/dropdown.dart';
 
 class ValueFieldSimple extends StatelessWidget {
   final String label;
@@ -59,6 +60,47 @@ class TextFormFieldIncident extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
       ),
+      validator: validator,
+    );
+  }
+}
+
+class DropdownListIncident extends StatelessWidget {
+  final List<DropdownItem> items;
+  final IconData icon;
+  final String? selectedValue;
+  final ValueChanged<String?> onChanged;
+  final String labelText;
+  final String? Function(String?)? validator;
+
+  const DropdownListIncident({
+    super.key,
+    required this.items,
+    required this.icon,
+    required this.selectedValue,
+    required this.onChanged,
+    required this.labelText,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      initialValue: selectedValue,
+      decoration: InputDecoration(
+        labelText: labelText,
+        prefixIcon: Icon(icon),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      items: items.map((item) {
+        return DropdownMenuItem<String>(
+          value: item.code,
+          child: Text(item.name),
+        );
+      }).toList(),
+      onChanged: onChanged,
       validator: validator,
     );
   }

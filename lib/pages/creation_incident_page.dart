@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:incident_hub/models/dropdown.dart';
+import 'package:uuid/uuid.dart';
+import 'package:incident_hub/data/incident_repository.dart';
+import 'package:incident_hub/data/user_repository.dart';
+import 'package:incident_hub/validations/incident_validation.dart';
 import 'package:incident_hub/widgets/app_bar_widget.dart';
 import 'package:incident_hub/widgets/incident_widget.dart';
 
@@ -11,10 +16,13 @@ class CreationIncidentPage extends StatefulWidget {
 }
 
 class _CreationIncidentPageState extends State<CreationIncidentPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _classroomController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  final userDB = UserSession.currentUser!;
+  final titleController = TextEditingController();
+  final classroomController = TextEditingController();
+  final descriptionController = TextEditingController();
+  String? selectedClassroom;
+  String? selectedType;
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +38,14 @@ class _CreationIncidentPageState extends State<CreationIncidentPage> {
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Form(
-              key: _formKey,
+              key: formKey,
               child: Column(
                 children: [
                   textFormFieldTitle(),
                   SizedBox(height: 16),
-                  textFormFieldClassroom(),
+                  dropdownListFieldClassroom(),
+                  SizedBox(height: 16),
+                  dropdownListFieldType(),
                   SizedBox(height: 16),
                   textFormFieldDescription(),
                   SizedBox(height: 24),
@@ -52,16 +62,38 @@ class _CreationIncidentPageState extends State<CreationIncidentPage> {
   Widget textFormFieldTitle() {
     return TextFormFieldIncident(
       labelText: 'Título',
-      controller: _titleController,
+      controller: titleController,
       validator: validateTitle,
     );
   }
 
-  Widget textFormFieldClassroom() {
-    return TextFormFieldIncident(
-      labelText: 'Aula',
-      controller: _classroomController,
+  Widget dropdownListFieldClassroom() {
+    return DropdownListIncident(
+      items: instituteClassroom.toList(),
+      icon: Icons.person,
+      selectedValue: selectedClassroom, 
+      labelText: 'Seleccione su Aula',
+      onChanged: (value) {
+        setState(() {
+          selectedClassroom = value;
+        });
+      },
       validator: validateClassroom,
+    );
+  }
+
+  Widget dropdownListFieldType() {
+    return DropdownListIncident(
+      items: incidentType.toList(),
+      icon: Icons.person,
+      selectedValue: selectedType, 
+      labelText: 'Seleccione un tipo de incidencia',
+      onChanged: (value) {
+        setState(() {
+          selectedType = value;
+        });
+      },
+      validator: validateType,
     );
   }
 
@@ -69,27 +101,13 @@ class _CreationIncidentPageState extends State<CreationIncidentPage> {
     return TextFormFieldIncident(
       labelText: 'Descripción',
       maxLines: 4,
-      controller: _descriptionController,
+      controller: descriptionController,
       validator: validateDescription,
     );
   }
 
   Widget createButton() {
     return ElevatedButton.icon(
-      onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          final newIncident = {
-            "title": _titleController.text,
-            "classroom": _classroomController.text,
-            "status": "PENDIENTE",
-            "creator": "Usuario ?",
-            "rol": "Desarrollador",
-            "date": "13/06/2026",
-            "description": _descriptionController.text,
-          };
-          Navigator.pop(context, newIncident);
-        }
-      },
       icon: Icon(Icons.save),
       label: Text("Crear incidencia"),
       style: ElevatedButton.styleFrom(
@@ -98,25 +116,27 @@ class _CreationIncidentPageState extends State<CreationIncidentPage> {
           borderRadius: BorderRadius.circular(12),
         ),
       ),
+      onPressed: () {
+        if (formKey.currentState!.validate()) {
+          final newIncident = Incident(
+            id: Uuid().v4(),
+            title: titleController.text,
+            classroom: selectedClassroom!,
+            type: selectedType!,
+            description: descriptionController.text,
+            status: "PENDING",
+            creator: Creator(email: userDB.email, name: userDB.name, role: userDB.role),
+            assignmentDate: null,
+            technicalSupport: null,
+            attentionDate: null,
+            createdDate: DateTime.now(),
+            updatedDate: DateTime.now(),
+          );
+          IncidentRepository.addIncident(newIncident);
+          
+          Navigator.pop(context, newIncident);
+        }
+      },
     );
   }
-}
-
-String? validateTitle(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Ingrese un título.';
-  }
-  return null;
-}
-String? validateClassroom(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Ingrese un aula.';
-  }
-  return null;
-}
-String? validateDescription(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Ingrese una descripción.';
-  }
-  return null;
 }

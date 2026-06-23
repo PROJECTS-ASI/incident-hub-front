@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:incident_hub/models/dropdown.dart';
+import 'package:intl/intl.dart';
+import 'package:incident_hub/data/incident_repository.dart';
 import 'package:incident_hub/pages/creation_incident_page.dart';
 import 'package:incident_hub/pages/detail_incident_page.dart';
 import 'package:incident_hub/pages/profile_user_page.dart';
 import 'package:incident_hub/widgets/incident_widget.dart';
 
-final List<Map<String, String>> incidents = [];
+final incidents = IncidentRepository.incidents;
 
 class IncidentPage extends StatefulWidget  {
   static const String id = 'incident_page';
@@ -116,7 +119,7 @@ class _IncidentPageState extends State<IncidentPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(incident['title']!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
+                    Text(incident.title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
                     IconButton(
                       icon: const Icon(Icons.arrow_circle_right, size: 21),
                       onPressed: () {
@@ -130,22 +133,22 @@ class _IncidentPageState extends State<IncidentPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ValueFieldSimple(label: "Aula", value: incident["classroom"]!),
-                    ValueFieldSimple(label: "Estado", value: incident["status"]!),
+                    ValueFieldSimple(label: "Aula", value: DropdownUtils.getName(instituteClassroom, incident.classroom)),
+                    ValueFieldSimple(label: "Estado", value: DropdownUtils.getName(incidentStatus, incident.status)),
                   ],
                 ),
                 SizedBox(height: 5),
-                ValueFieldSimple( label: "Creado por", value: incident["creator"]!),
+                ValueFieldSimple( label: "Creado por", value: incident.creator.name),
                 SizedBox(height: 5),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ValueFieldSimple(label: "Rol",  value: incident["rol"]!),
-                    ValueFieldSimple(label: "Fecha de registro", value: incident["date"]!),
+                    ValueFieldSimple(label: "Rol",  value: DropdownUtils.getName(userRole, incident.creator.role)),
+                    ValueFieldSimple(label: "Fecha de registro", value: DateFormat('dd/MM/yyyy HH:mm').format(incident.updatedDate)),
                   ],
                 ),
                 SizedBox(height: 8),
-                ValueFieldSimple(label: "Descripción", value: incident["description"]!),
+                ValueFieldSimple(label: "Descripción", value: incident.description),
               ],
             ),
           ),
@@ -164,15 +167,11 @@ class _IncidentPageState extends State<IncidentPage> {
         ),
         backgroundColor: Colors.blue,
         onPressed: () async {
-          final newIncident = await Navigator.pushNamed(
+          await Navigator.pushNamed(
             context,
             CreationIncidentPage.id,
           );
-          if (newIncident != null) {
-            setState(() {
-              incidents.add(newIncident as Map<String, String>);
-            });
-          }
+          setState(() {});
         },
         child: const Icon(Icons.add, size: 32, color: Colors.white),
       ),

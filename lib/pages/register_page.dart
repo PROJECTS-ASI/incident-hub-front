@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:incident_hub/data/user_repository.dart';
+import 'package:incident_hub/models/dropdown.dart';
 import 'package:incident_hub/pages/login_page.dart';
 import 'package:incident_hub/validations/auth_validation.dart';
 import 'package:incident_hub/widgets/auth_widget.dart';
@@ -110,12 +111,9 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget dropdownListField() {
+    final rolesToShow = userRole.where((role) => role.code != 'ADMIN').toList();
     return DropdownList(
-      items: [
-        { 'code': 'STUDENT', 'name': 'Estudiante' },
-        { 'code': 'TEACHER', 'name': 'Docente' },
-        { 'code': 'TECHNICAL_SUPPORT', 'name': 'Soporte técnico' },
-      ],
+      items: rolesToShow,
       icon: Icons.person,
       selectedValue: selectedRole, 
       labelText: 'Seleccione su rol',

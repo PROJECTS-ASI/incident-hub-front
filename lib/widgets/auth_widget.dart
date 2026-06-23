@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:incident_hub/models/dropdown.dart';
 
 class TextFormFieldGeneral extends StatelessWidget {
   final TextInputType keyboardType;
@@ -90,7 +91,7 @@ class RedirectText extends StatelessWidget {
 }
 
 class DropdownList extends StatelessWidget {
-  final List<Map<String, String>> items;
+  final List<DropdownItem> items;
   final IconData icon;
   final String? selectedValue;
   final ValueChanged<String?> onChanged;
@@ -122,8 +123,8 @@ class DropdownList extends StatelessWidget {
       ),
       items: items.map((item) {
         return DropdownMenuItem<String>(
-          value: item['code'],
-          child: Text(item['name']!),
+          value: item.code,
+          child: Text(item.name),
         );
       }).toList(),
       onChanged: onChanged,
