@@ -7,18 +7,21 @@ String? validateTitle(String? value) {
   }
   return null;
 }
+
 String? validateClassroom(String? value) {
   if (value == null || value.trim().isEmpty) {
     return 'Ingrese un aula o laboratorio.';
   }
   return null;
 }
+
 String? validateType(String? value) {
   if (value == null || value.trim().isEmpty) {
     return 'Ingrese un tipo de incidencia.';
   }
   return null;
 }
+
 String? validateDescription(String? value) {
   if (value == null || value.trim().isEmpty) {
     return 'Ingrese una descripción.';

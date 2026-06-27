@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:incident_hub/models/dropdown.dart';
+import 'package:incident_hub/pages/incident_page.dart';
 import 'package:uuid/uuid.dart';
 import 'package:incident_hub/data/incident_repository.dart';
 import 'package:incident_hub/data/user_repository.dart';
@@ -17,9 +18,8 @@ class CreationIncidentPage extends StatefulWidget {
 
 class _CreationIncidentPageState extends State<CreationIncidentPage> {
   final formKey = GlobalKey<FormState>();
-  final userDB = UserSession.currentUser!;
+  User get userDB => UserSession.currentUser!;
   final titleController = TextEditingController();
-  final classroomController = TextEditingController();
   final descriptionController = TextEditingController();
   String? selectedClassroom;
   String? selectedType;
@@ -27,7 +27,7 @@ class _CreationIncidentPageState extends State<CreationIncidentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PagesAppBar(title: "NUEVA INCIDENCIA"),
+      appBar: PagesAppBar(title: "NUEVA INCIDENCIA", arrowBack: true, route: IncidentPage.id),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Card(
@@ -70,7 +70,7 @@ class _CreationIncidentPageState extends State<CreationIncidentPage> {
   Widget dropdownListFieldClassroom() {
     return DropdownListIncident(
       items: instituteClassroom.toList(),
-      icon: Icons.person,
+      icon: Icons.home,
       selectedValue: selectedClassroom, 
       labelText: 'Seleccione su Aula',
       onChanged: (value) {
@@ -85,7 +85,7 @@ class _CreationIncidentPageState extends State<CreationIncidentPage> {
   Widget dropdownListFieldType() {
     return DropdownListIncident(
       items: incidentType.toList(),
-      icon: Icons.person,
+      icon: Icons.type_specimen,
       selectedValue: selectedType, 
       labelText: 'Seleccione un tipo de incidencia',
       onChanged: (value) {
@@ -108,10 +108,11 @@ class _CreationIncidentPageState extends State<CreationIncidentPage> {
 
   Widget createButton() {
     return ElevatedButton.icon(
-      icon: Icon(Icons.save),
-      label: Text("Crear incidencia"),
+      icon: Icon(Icons.save, color: Colors.white),
+      label: Text("CREAR", style: TextStyle(color: Colors.white)),
       style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 40),
+        backgroundColor: const Color.fromARGB(255, 20, 121, 204),
+        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 25),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -125,7 +126,7 @@ class _CreationIncidentPageState extends State<CreationIncidentPage> {
             type: selectedType!,
             description: descriptionController.text,
             status: "PENDING",
-            creator: Creator(email: userDB.email, name: userDB.name, role: userDB.role),
+            creator: Creator(email: userDB.email, name:  "${userDB.name} ${userDB.lastName}", role: userDB.role),
             assignmentDate: null,
             technicalSupport: null,
             attentionDate: null,
@@ -134,7 +135,7 @@ class _CreationIncidentPageState extends State<CreationIncidentPage> {
           );
           IncidentRepository.addIncident(newIncident);
           
-          Navigator.pop(context, newIncident);
+          Navigator.pushReplacementNamed(context, IncidentPage.id);
         }
       },
     );

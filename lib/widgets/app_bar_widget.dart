@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:incident_hub/pages/profile_user_page.dart';
 
 class PagesAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final bool arrowBack;
+  final String? route;
+  final bool profile;
 
   const PagesAppBar({
     super.key,
     required this.title,
+    this.arrowBack = false,
+    this.route,
+    this.profile = false,
   });
 
   @override
@@ -23,13 +30,21 @@ class PagesAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 10,
       shadowColor: Colors.black,
       centerTitle: true,
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back), 
-        color: Colors.lightBlue,
+      leading: arrowBack && route != null ? IconButton(
+        icon: Icon(Icons.arrow_back),
+        color: Colors.black,
         onPressed: () {
-          Navigator.pop(context);
+          Navigator.pushReplacementNamed(context, route!);
         },
-      ),
+      ): null,
+      actions: profile ? [
+        IconButton(
+          icon: Icon(Icons.person, size: 35, color: Colors.white),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, ProfileUserPage.id);
+          },
+        )
+      ] : null,
       toolbarHeight: 100,
     );
   }

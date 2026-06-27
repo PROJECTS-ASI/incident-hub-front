@@ -48,6 +48,35 @@ class Incident {
     required this.createdDate,
     required this.updatedDate,
   });
+
+  Incident update({
+    String? title,
+    String? classroom,
+    String? type,
+    String? description,
+    String? status,
+    Creator? creator,
+    TechnicalSupport? technicalSupport,
+    DateTime? assignmentDate,
+    DateTime? attentionDate,
+    DateTime? createdDate,
+    DateTime? updatedDate,
+  }) {
+    return Incident(
+      id: id,
+      title: title ?? this.title,
+      classroom: classroom ?? this.classroom,
+      type: type ?? this.type,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      creator: creator ?? this.creator,
+      technicalSupport: technicalSupport ?? this.technicalSupport,
+      assignmentDate: assignmentDate ?? this.assignmentDate,
+      attentionDate: attentionDate ?? this.attentionDate,
+      createdDate: createdDate ?? this.createdDate,
+      updatedDate: updatedDate ?? this.updatedDate,
+    );
+  }
 }
 
 class IncidentRepository {
@@ -55,6 +84,31 @@ class IncidentRepository {
 
   static void addIncident(Incident incident) {
     incidents.add(incident);
+  }
+
+  static bool updateIncident({ 
+    required String id,
+    required String title,
+    required String classroom,
+    required String type,
+    required String description,
+    required DateTime updatedDate,
+  }) {
+    final index = incidents.indexWhere((i) => i.id == id);
+
+    if (index == -1) {
+      return false;
+    }
+
+    final record = incidents[index];
+    incidents[index] = record.update(
+      title: title,
+      classroom: classroom,
+      type: type,
+      description: description,
+      updatedDate: updatedDate,
+    );
+    return true;
   }
 
   static List<Incident> getIncidents() {

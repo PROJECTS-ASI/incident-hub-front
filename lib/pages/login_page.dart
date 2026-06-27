@@ -74,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget passwordTextField() {
     return TextFormFieldGeneral(
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.visiblePassword,
       icon: Icons.lock_outline_rounded,
       labelText: "Contraseña",
       hintText: "********",

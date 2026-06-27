@@ -4,11 +4,13 @@ import 'package:incident_hub/models/dropdown.dart';
 class ValueFieldSimple extends StatelessWidget {
   final String label;
   final String value;
+  final bool valueBold;
 
   const ValueFieldSimple({
     super.key,
     required this.label,
     required this.value,
+    this.valueBold = false,
   });
 
   @override
@@ -18,14 +20,15 @@ class ValueFieldSimple extends StatelessWidget {
         children: [
           TextSpan(
             text: '$label: ',
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
             ),
           ),
           TextSpan(
             text: value,
             style: TextStyle(
-              color: _getValueColor(label, value),
+              color: getValueColor(label, value),
+              fontWeight: valueBold ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ],
@@ -39,6 +42,7 @@ class TextFormFieldIncident extends StatelessWidget {
   final int? maxLines;
   final TextEditingController controller;
   final String? Function(String?)? validator;
+  final bool readOnly;
 
   const TextFormFieldIncident({
     super.key,
@@ -46,11 +50,13 @@ class TextFormFieldIncident extends StatelessWidget {
     this.maxLines,
     required this.controller,
     this.validator,
+    this.readOnly = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: readOnly,
       controller: controller,
       maxLines: maxLines,
       decoration: InputDecoration(
@@ -69,7 +75,7 @@ class DropdownListIncident extends StatelessWidget {
   final List<DropdownItem> items;
   final IconData icon;
   final String? selectedValue;
-  final ValueChanged<String?> onChanged;
+  final ValueChanged<String?>? onChanged;
   final String labelText;
   final String? Function(String?)? validator;
 
@@ -106,14 +112,14 @@ class DropdownListIncident extends StatelessWidget {
   }
 }
 
-Color _getValueColor(String label, String value) {
+Color getValueColor(String label, String value) {
     if (label == 'Estado') {
       switch (value) {
         case 'PENDIENTE':
           return Colors.red;
         case 'EN PROCESO':
           return Colors.blue;
-        case 'RESUELTO':
+        case 'ATENDIDO':
           return Colors.green;
         case 'RECHAZADO':
           return Colors.red;

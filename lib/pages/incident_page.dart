@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:incident_hub/data/user_repository.dart';
 import 'package:incident_hub/models/dropdown.dart';
+import 'package:incident_hub/widgets/app_bar_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:incident_hub/data/incident_repository.dart';
 import 'package:incident_hub/pages/creation_incident_page.dart';
 import 'package:incident_hub/pages/detail_incident_page.dart';
-import 'package:incident_hub/pages/profile_user_page.dart';
 import 'package:incident_hub/widgets/incident_widget.dart';
-
-final incidents = IncidentRepository.incidents;
 
 class IncidentPage extends StatefulWidget  {
   static const String id = 'incident_page';
@@ -18,11 +17,15 @@ class IncidentPage extends StatefulWidget  {
 }
 
 class _IncidentPageState extends State<IncidentPage> {
+  User get userDB => UserSession.currentUser!;
+  final incidents = IncidentRepository.getIncidents();
+  String searchText = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: appBar(),
+      appBar: PagesAppBar(title: "INCIDENCIAS", profile: true),
       body: incidents.isEmpty ? notRecords() : Column(
         children: [
           searchBar(),
@@ -30,31 +33,6 @@ class _IncidentPageState extends State<IncidentPage> {
         ],
       ),
       floatingActionButton: addButton(),
-    );
-  }
-
-  PreferredSizeWidget appBar() {
-    return AppBar(
-      title: Text(
-        "INCIDENCIAS",
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 20
-        ),
-      ),
-      backgroundColor: const Color.fromARGB(255, 15, 100, 169),
-      elevation: 10,
-      shadowColor: Colors.black,
-      centerTitle: true,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.person, size: 35, color: Colors.white),
-          onPressed: () {
-            Navigator.pushNamed(context, ProfileUserPage.id);
-          },
-        )
-      ],
     );
   }
 
@@ -78,6 +56,11 @@ class _IncidentPageState extends State<IncidentPage> {
     return Padding(
       padding: EdgeInsets.all(10),
       child: TextField(
+        onChanged: (value) {
+          setState(() {
+            searchText = value;
+          });
+        },
         decoration: InputDecoration(
           hintText: "Buscar incidencia...",
           prefixIcon: Icon(Icons.search),
@@ -104,11 +87,15 @@ class _IncidentPageState extends State<IncidentPage> {
   }
 
   Widget withRecords() {
+    final filteredIncidents = incidents.where((incident) {
+      return incident.title.toLowerCase().contains(searchText.trim().toLowerCase());
+    }).toList();
+
     return ListView.builder(
       padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 80),
-      itemCount: incidents.length,
+      itemCount: filteredIncidents.length,
       itemBuilder: (context, index) {
-        final incident = incidents[index];
+        final incident = filteredIncidents[index];
         return Card(
           color: Colors.white,
           child: Padding(
@@ -121,9 +108,9 @@ class _IncidentPageState extends State<IncidentPage> {
                   children: [
                     Text(incident.title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
                     IconButton(
-                      icon: const Icon(Icons.arrow_circle_right, size: 21),
+                      icon: Icon(Icons.arrow_circle_right, size: 22),
                       onPressed: () {
-                        Navigator.pushNamed(context, DetailIncidentPage.id, arguments: incident);
+                        Navigator.pushReplacementNamed(context, DetailIncidentPage.id, arguments: incident);
                       },
                       color: Colors.lightBlue,
                     ),
@@ -133,22 +120,26 @@ class _IncidentPageState extends State<IncidentPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ValueFieldSimple(label: "Aula", value: DropdownUtils.getName(instituteClassroom, incident.classroom)),
-                    ValueFieldSimple(label: "Estado", value: DropdownUtils.getName(incidentStatus, incident.status)),
+                    ValueFieldSimple(
+                      label: "Aula", 
+                      value: DropdownUtils.getName(instituteClassroom, incident.classroom)
+                    ),
+                    ValueFieldSimple(
+                      label: "Estado", 
+                      value: DropdownUtils.getName(incidentStatus, incident.status), valueBold: true
+                    ),
                   ],
                 ),
-                SizedBox(height: 5),
-                ValueFieldSimple( label: "Creado por", value: incident.creator.name),
-                SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ValueFieldSimple(label: "Rol",  value: DropdownUtils.getName(userRole, incident.creator.role)),
-                    ValueFieldSimple(label: "Fecha de registro", value: DateFormat('dd/MM/yyyy HH:mm').format(incident.updatedDate)),
-                  ],
+                SizedBox(height: 7),
+                ValueFieldSimple(
+                  label: "Creado por", 
+                  value: incident.creator.name
                 ),
-                SizedBox(height: 8),
-                ValueFieldSimple(label: "Descripción", value: incident.description),
+                SizedBox(height: 7),
+                ValueFieldSimple(
+                  label: "Fecha de registro", 
+                  value: DateFormat('dd/MM/yyyy HH:mm').format(incident.createdDate)
+                ),
               ],
             ),
           ),
@@ -161,20 +152,20 @@ class _IncidentPageState extends State<IncidentPage> {
     return SizedBox(
       width: 35,
       height: 35,
-      child: FloatingActionButton(
+      child: userDB.role != 'TECHNICAL_SUPPORT' ? FloatingActionButton(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(20),
         ),
         backgroundColor: Colors.blue,
         onPressed: () async {
-          await Navigator.pushNamed(
+          await Navigator.pushReplacementNamed(
             context,
             CreationIncidentPage.id,
           );
           setState(() {});
         },
         child: const Icon(Icons.add, size: 32, color: Colors.white),
-      ),
+      ) : null,
     );
   }
 }

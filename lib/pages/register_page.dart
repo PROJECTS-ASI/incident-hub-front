@@ -17,6 +17,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
+  final lastNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   String? selectedRole;
@@ -46,6 +47,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(height: 50.0),
                   nameTextField(),
                   SizedBox(height: 10.0),
+                  lastNameTextField(),
+                  SizedBox(height: 10.0),
                   emailTextField(),
                   SizedBox(height: 10.0),
                   passwordTextField(),
@@ -68,14 +71,29 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormFieldGeneral(
       keyboardType: TextInputType.name,
       icon: Icons.person_outline,
-      labelText: "Nombres y Apellidos",
-      hintText: "Jimmy Page",
+      labelText: "Nombres",
+      hintText: "Jimmy Patrick",
       onChanged: (value) {},
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ ]")),
       ],
       controller: nameController,
       validator: validateName,
+    );
+  }
+
+  Widget lastNameTextField() {
+    return TextFormFieldGeneral(
+      keyboardType: TextInputType.name,
+      icon: Icons.person_outline,
+      labelText: "Apellidos",
+      hintText: "Page Heston",
+      onChanged: (value) {},
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ ]")),
+      ],
+      controller: lastNameController,
+      validator: validateLastName,
     );
   }
 
@@ -96,7 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget passwordTextField() {
     return TextFormFieldGeneral(
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.visiblePassword,
       icon: Icons.lock_outline_rounded,
       labelText: "Contraseña",
       hintText: "********",
@@ -145,12 +163,16 @@ class _RegisterPageState extends State<RegisterPage> {
               email: email,
               password: passwordController.text,
               name: nameController.text.trim(),
+              lastName: lastNameController.text.trim(),
               role: selectedRole!,
+              cellphone: "",
+              direction: "",
+              document: "",
               createdDate: DateTime.now(),
               updatedDate: DateTime.now(),
             ),
           );
-          Navigator.pushNamed(context, LoginPage.id);
+          Navigator.pushReplacementNamed(context, LoginPage.id);
         }
       },
     );

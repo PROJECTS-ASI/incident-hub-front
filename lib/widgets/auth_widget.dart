@@ -11,6 +11,7 @@ class TextFormFieldGeneral extends StatelessWidget {
   final bool obscureText;
   final List<TextInputFormatter>? inputFormatters;
   final TextEditingController controller;
+  final bool readOnly;
   final String? Function(String?)? validator;
 
   const TextFormFieldGeneral({
@@ -23,6 +24,7 @@ class TextFormFieldGeneral extends StatelessWidget {
     this.obscureText = false,
     this.inputFormatters,
     required this.controller,
+    this.readOnly = false,
     this.validator,
   });
 
@@ -34,6 +36,7 @@ class TextFormFieldGeneral extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: TextFormField(
+        readOnly: readOnly,
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,

@@ -31,10 +31,10 @@ final List<DropdownItem> incidentType = [
 ];
 
 final List<DropdownItem> incidentStatus = [
-  DropdownItem(code: 'PENDING', name: 'Pendiente'),
-  DropdownItem(code: 'IN_PROCESS', name: 'En proceso'),
-  DropdownItem(code: 'ATTENDED', name: 'Atendido'),
-  DropdownItem(code: 'REJECTED', name: 'Rechazado'),
+  DropdownItem(code: 'PENDING', name: 'PENDIENTE'),
+  DropdownItem(code: 'IN_PROCESS', name: 'EN PROCESO'),
+  DropdownItem(code: 'ATTENDED', name: 'ATENDIDO'),
+  DropdownItem(code: 'REJECTED', name: 'RECHAZADO'),
 ];
 
 class DropdownUtils {
