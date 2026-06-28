@@ -18,7 +18,8 @@ class CreationIncidentPage extends StatefulWidget {
 
 class _CreationIncidentPageState extends State<CreationIncidentPage> {
   final formKey = GlobalKey<FormState>();
-  User get userDB => UserSession.currentUser!;
+  String get email => UserSession.currentEmail!;
+  User get userDB => UserRepository.getUserByEmail(email)!;
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   String? selectedClassroom;

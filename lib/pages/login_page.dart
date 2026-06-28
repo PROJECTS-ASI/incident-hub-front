@@ -100,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
             );
             return;
           }
-          UserSession.currentUser = user;
+          UserSession.currentEmail = email;
           Navigator.pushReplacementNamed(context, IncidentPage.id);
         }
       },

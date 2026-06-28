@@ -17,7 +17,8 @@ class DetailIncidentPage extends StatefulWidget {
 }
 
 class _DetailIncidentPageState extends State<DetailIncidentPage> {
-  User get userDB => UserSession.currentUser!;
+  String get email => UserSession.currentEmail!;
+  User get userDB => UserRepository.getUserByEmail(email)!;
   final formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -139,7 +140,7 @@ class _DetailIncidentPageState extends State<DetailIncidentPage> {
       labelText: 'Título',
       controller: titleController,
       validator: validateTitle,
-      readOnly: editAccess ? true : false,
+      readOnly: editAccess ? false : true,
     );
   }
 
@@ -179,7 +180,7 @@ class _DetailIncidentPageState extends State<DetailIncidentPage> {
       maxLines: 4,
       controller: descriptionController,
       validator: validateDescription,
-      readOnly: editAccess ? true : false,
+      readOnly: editAccess ? false : true,
     );
   }
 

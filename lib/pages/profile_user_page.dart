@@ -19,7 +19,8 @@ class ProfileUserPage extends StatefulWidget {
 }
 
 class _ProfileUserPageState extends State<ProfileUserPage> {
-  User get userDB => UserSession.currentUser!;
+  String get email => UserSession.currentEmail!;
+  User get userDB => UserRepository.getUserByEmail(email)!;
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final nameController = TextEditingController();
@@ -180,7 +181,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
 
   Widget documentTextField() {
     return TextFormFieldGeneral(
-      keyboardType: TextInputType.text,
+      keyboardType: TextInputType.number,
       icon: Icons.edit_document,
       labelText: "DNI",
       hintText: "87654321",

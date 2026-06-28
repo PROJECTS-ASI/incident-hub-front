@@ -108,12 +108,22 @@ class UserRepository {
   static bool emailExists(String email) {
     return users.any((u) => u.email == email);
   }
+
+  static User? getUserByEmail(String email) {
+    try {
+      return users.firstWhere(
+        (u) => u.email == email,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 }
 
 class UserSession {
-  static User? currentUser;
+  static String? currentEmail;
 
   static void logout() {
-    currentUser = null;
+    currentEmail = null;
   }
 }

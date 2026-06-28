@@ -17,7 +17,8 @@ class IncidentPage extends StatefulWidget  {
 }
 
 class _IncidentPageState extends State<IncidentPage> {
-  User get userDB => UserSession.currentUser!;
+  String get email => UserSession.currentEmail!;
+  User get userDB => UserRepository.getUserByEmail(email)!;
   final incidents = IncidentRepository.getIncidents();
   String searchText = "";
 
